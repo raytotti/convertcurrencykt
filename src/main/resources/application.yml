@@ -1,0 +1,28 @@
+spring:
+  h2:
+    console:
+      enabled: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USER}
+    password: ${DATASOURCE_PASSWORD}
+    hikari:
+      auto-commit: false
+  flyway:
+    enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: false
+conversion:
+  access-key: ${API_EXCHANGE_ACCESS_KEY}
+  url: ${API_EXCHANGE_URL}
+  uri: ${API_EXCHANGE_URI}
+server:
+  port: ${PORT}
