@@ -20,6 +20,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: false
+  jackson:
+    default-property-inclusion: non_null
 conversion:
   access-key: ${API_EXCHANGE_ACCESS_KEY}
   url: ${API_EXCHANGE_URL}
