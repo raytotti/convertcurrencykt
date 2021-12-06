@@ -15,14 +15,12 @@ class ValidationRequestErrorHandler(val messageSource: MessageSource) {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handle(exception: MethodArgumentNotValidException): ResponseEntity<List<FieldRequestError>> {
-
-        val responses: MutableList<FieldRequestError> = mutableListOf()
-
-        exception.bindingResult.fieldErrors.forEach {
-            val message = messageSource.getMessage(it, LocaleContextHolder.getLocale())
-            responses.add(FieldRequestError(it.field, message))
-        }
-
-        return ResponseEntity(responses, HttpStatus.BAD_REQUEST)
+        return ResponseEntity(
+            exception.bindingResult.fieldErrors.map {
+                val message = messageSource.getMessage(it, LocaleContextHolder.getLocale())
+                FieldRequestError(it.field, message)
+            },
+            HttpStatus.BAD_REQUEST
+        )
     }
 }
