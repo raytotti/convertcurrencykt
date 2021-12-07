@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
-class EnumRequestErrorHandler(val messageSource: MessageSource) {
+class EnumRequestErrorHandler(private val messageSource: MessageSource) {
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException::class)

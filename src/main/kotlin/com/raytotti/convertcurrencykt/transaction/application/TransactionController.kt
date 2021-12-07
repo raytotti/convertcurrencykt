@@ -1,6 +1,7 @@
 package com.raytotti.convertcurrencykt.transaction.application
 
 import com.raytotti.convertcurrencykt.commons.application.ResponseCollection
+import com.raytotti.convertcurrencykt.commons.application.toResponseCollection
 import com.raytotti.convertcurrencykt.conversion.domain.Conversion
 import com.raytotti.convertcurrencykt.conversion.domain.IConversionService
 import com.raytotti.convertcurrencykt.transaction.domain.TransactionRepository
@@ -9,7 +10,6 @@ import com.raytotti.convertcurrencykt.transaction.extension.toTransactionModel
 import com.raytotti.convertcurrencykt.transaction.extension.toTransactionResponse
 import com.raytotti.convertcurrencykt.user.domain.UserRepository
 import com.raytotti.convertcurrencykt.user.exception.UserNotFound
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -21,9 +21,9 @@ import javax.transaction.Transactional
 @RestController
 @RequestMapping("/api/v1/transactions")
 class TransactionController(
-    val repository: TransactionRepository,
-    val userRepository: UserRepository,
-    val conversionService: IConversionService
+    private val repository: TransactionRepository,
+    private val userRepository: UserRepository,
+    private val conversionService: IConversionService
 ) {
 
     @PostMapping
@@ -40,14 +40,15 @@ class TransactionController(
         val uri = fromCurrentRequest()
             .path("/")
             .path(response.id.toString())
-            .build().toUri();
-        return ResponseEntity.created(uri).body(response);
+            .build().toUri()
+        return ResponseEntity.created(uri).body(response)
     }
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Long): ResponseEntity<TransactionResponse> {
-        val response = repository.findById(id).orElseThrow { TransactionNotFound() } .toTransactionResponse()
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok(
+            repository.findById(id).orElseThrow { TransactionNotFound() }.toTransactionResponse()
+        )
     }
 
     @GetMapping("/users/{userId}")
@@ -60,14 +61,12 @@ class TransactionController(
             direction = Sort.Direction.DESC
         ) pageable: Pageable
     ): ResponseEntity<ResponseCollection<TransactionResponse>> {
-
-        if (!userRepository.existsById(userId)) {
+        return if (!userRepository.existsById(userId)) {
             throw UserNotFound()
+        } else {
+            ResponseEntity.ok(
+                repository.findByUserId(userId, pageable).map { it.toTransactionResponse() }.toResponseCollection()
+            )
         }
-
-        val transactions: Page<TransactionResponse> =
-            repository.findByUserId(userId, pageable).map { it.toTransactionResponse() }
-
-        return ResponseEntity.ok(ResponseCollection(transactions))
     }
 }

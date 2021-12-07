@@ -6,6 +6,7 @@ plugins {
 	kotlin("jvm") version "1.6.0"
 	kotlin("plugin.spring") version "1.6.0"
 	kotlin("plugin.jpa") version "1.6.0"
+	jacoco
 }
 
 group = "com.raytotti"
@@ -32,8 +33,12 @@ dependencies {
 	implementation("org.flywaydb:flyway-core:8.1.0")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
 	runtimeOnly("com.h2database:h2")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("io.mockk:mockk:1.12.1")
+
 }
 
 tasks.withType<KotlinCompile> {
