@@ -23,11 +23,9 @@ class FindAllUserIT {
     @Autowired
     private lateinit var mock: MockMvc
 
-    private val urlTemplate: String = "/api/v1/users"
-
     @Test
     fun findPageDefault() {
-        mock.perform(get(urlTemplate))
+        mock.perform(get(getUrlTemplate()))
             .andExpect(status().is2xxSuccessful)
             .andExpect(jsonPath("$.items.length()").value(3))
             .andExpect(jsonPath("$.hasNext").value(false))
@@ -39,7 +37,7 @@ class FindAllUserIT {
     @Test
     fun findPage() {
         mock.perform(
-            get(urlTemplate)
+            get(getUrlTemplate())
                 .param("page", "0")
                 .param("size", "2")
         )
@@ -51,7 +49,7 @@ class FindAllUserIT {
             .andExpect(jsonPath("$.items[0].name").value("Maria"))
 
         mock.perform(
-            get(urlTemplate)
+            get(getUrlTemplate())
                 .param("page", "1")
                 .param("size", "2")
         )

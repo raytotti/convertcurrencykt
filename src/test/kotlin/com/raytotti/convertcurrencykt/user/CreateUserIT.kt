@@ -1,7 +1,6 @@
 package com.raytotti.convertcurrencykt.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.raytotti.convertcurrencykt.user.application.CreateUserRequest
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,28 +30,26 @@ class CreateUserIT {
 
     @Test
     fun create() {
-        val urlTemplate = "/api/v1/users"
-        val cpf = "430.609.538-05"
-        val name = "Ray Toti Felix de Araujo"
-        val userRequest = CreateUserRequest(cpf, name)
+        val userRequest = buildUserRequest()
 
-        mock.perform(post(urlTemplate).contentType(APPLICATION_JSON).content(mapper.writeValueAsBytes(userRequest)))
+        mock.perform(
+            post(getUrlTemplate()).contentType(APPLICATION_JSON).content(mapper.writeValueAsBytes(userRequest))
+        )
             .andExpect(status().isCreated)
             .andExpect(header().exists(LOCATION))
-            .andExpect(redirectedUrlPattern("**//**${urlTemplate}/*"))
+            .andExpect(redirectedUrlPattern("**//**${getUrlTemplate()}/*"))
             .andExpect(jsonPath("$.id").exists())
-            .andExpect(jsonPath("$.name").value(name))
-            .andExpect(jsonPath("$.cpf").value(cpf))
+            .andExpect(jsonPath("$.name").value(userRequest.name))
+            .andExpect(jsonPath("$.cpf").value(userRequest.cpf))
     }
 
     @Test
     fun createWithCpfExists() {
-        val urlTemplate = "/api/v1/users"
-        val cpf = "911.135.730-40"
-        val name = "Ray Toti Felix de Araujo"
-        val userRequest = CreateUserRequest(cpf, name)
+        val userRequest = buildUserRequest(cpf = "911.135.730-40")
 
-        mock.perform(post(urlTemplate).contentType(APPLICATION_JSON).content(mapper.writeValueAsBytes(userRequest)))
+        mock.perform(
+            post(getUrlTemplate()).contentType(APPLICATION_JSON).content(mapper.writeValueAsBytes(userRequest))
+        )
             .andExpect(status().isConflict)
     }
 }

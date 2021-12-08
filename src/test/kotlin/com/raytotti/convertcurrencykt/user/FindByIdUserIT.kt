@@ -17,22 +17,25 @@ import javax.transaction.Transactional
 @SpringBootTest
 @Tag("integration")
 @AutoConfigureMockMvc
+@Sql(scripts = ["classpath:db/it/base/user/FindByIdUser.sql"])
 class FindByIdUserIT {
 
     @Autowired
     private lateinit var mock: MockMvc
 
     @Test
-    @Sql(scripts = ["classpath:db/it/base/user/FindByIdUser.sql"])
     fun find() {
-        val userId = "1"
-        val cpf = "430.609.538-05"
-        val name = "Ray"
-
-        mock.perform(get("/api/v1/users/${userId}"))
+        mock.perform(get(getUrlTemplate("/1")))
             .andExpect(status().is2xxSuccessful)
-            .andExpect(jsonPath("$.id").exists())
-            .andExpect(jsonPath("$.name").value(name))
-            .andExpect(jsonPath("$.cpf").value(cpf))
+            .andExpect(jsonPath("$.id").value("1"))
+            .andExpect(jsonPath("$.name").value("Ray"))
+            .andExpect(jsonPath("$.cpf").value("430.609.538-05"))
+    }
+
+
+    @Test
+    fun findNotFound() {
+        mock.perform(get(getUrlTemplate("/10")))
+            .andExpect(status().isNotFound)
     }
 }
